@@ -5,7 +5,7 @@
 
 package autocompletardso2;
 
-import autocompletardso2.componente.AutoCompleteBean;
+import autocompletardso2.AutoCompleteBean;
 
 /**
  *
@@ -18,11 +18,12 @@ public class Main {
      */
     public static void main(String[] args) {
          javax.swing.JFrame frame = new javax.swing.JFrame();  // Cria frame
-         frame.setSize(100, 50);
-         String [] valores = {"","a","aaaa","aadsfasdf","fadfsaa","asdfasdfa","atreqwr","rqwea"};
-         AutoCompleteBean bean = new AutoCompleteBean(valores); // Instancia o bean
+         frame.setSize(300, 60);
+         //List<String> valores = {"","Ana","Ananda","Ananda Silva","Ana Lucia","Barbara","Bruna","Joao","Joana","Joao Paulo","Mauro","Marcos","Marcos Paulo"};
+         AutoCompleteBean bean = new AutoCompleteBean(); // Instancia o bean
+         //bean.setValores(valores);
         // Alterar as propriedades que julgar necessárias aqui!
-         frame.add(bean);  // Adiciona bean ao frame
+        frame.add(bean);  // Adiciona bean ao frame
         frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);  // Exibe o frame
     }
