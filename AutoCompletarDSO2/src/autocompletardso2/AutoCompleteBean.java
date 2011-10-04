@@ -1,21 +1,16 @@
 package autocompletardso2;
-import java.awt.event.ItemEvent;
-import java.awt.event.KeyAdapter;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.beans.*;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.event.ListDataListener;
 import java.beans.*;
 import java.io.Serializable;
 
-public class AutoCompleteBean extends JComboBox implements Serializable {
+public class AutoCompleteBean extends JComboBox implements Serializable, KeyListener{
     
     public static final String PROP_SAMPLE_PROPERTY = "sampleProperty";
     private String sampleProperty;
@@ -25,6 +20,10 @@ public class AutoCompleteBean extends JComboBox implements Serializable {
     protected List<Object> valores;
     private List<Object> busca;
     private String valorBuscado;
+    private boolean caseSensitive;
+    private Color corSelecionado;
+    private Color corDeFundo;
+    private Font fonte;
     
     public AutoCompleteBean() {
         super();
@@ -32,23 +31,24 @@ public class AutoCompleteBean extends JComboBox implements Serializable {
         this.busca = new ArrayList();
         this.valores = new ArrayList();
         this.setEditable(true);
-        this.addKeyListener(new trataEventos());
         // pra nao atrapalhar na hora de digitar
             this.setKeySelectionManager(new KeySelectionManager() {
             @Override
             public int selectionForKey(char c, javax.swing.ComboBoxModel model)
             { return -1; }
             }); 
-        
+        addKeyListener();
+        corDeFundo = Color.gray;
+        corSelecionado = Color.lightGray;
+        fonte = Font.getFont(Font.SANS_SERIF);
+        this.getEditor().getEditorComponent().setFont(fonte);
         propertySupport = new PropertyChangeSupport(this);
     }
     
-    
-    @Override
-    public void addKeyListener(KeyListener listener)
+    public void addKeyListener()
     {
         this.campo = (JTextField) this.getEditor().getEditorComponent();
-        campo.addKeyListener(listener);
+        campo.addKeyListener(this);
     }
 
     private List<Object> busca(String digitada) {
@@ -56,7 +56,7 @@ public class AutoCompleteBean extends JComboBox implements Serializable {
                     
         for (int i=0; i<valores.size(); i++){
             String daLista = valores.get(i).toString();
-            if((daLista.toLowerCase()).startsWith(digitada.toLowerCase()))
+            if((isCaseSensitive()?daLista:daLista.toLowerCase()).startsWith(isCaseSensitive()?digitada:digitada.toLowerCase()))
                 busca.add(daLista);        
         }
         valorBuscado=digitada;
@@ -74,29 +74,25 @@ public class AutoCompleteBean extends JComboBox implements Serializable {
         this.revalidate();        
         campo.setText(valorBuscado);
     }   
+    @Override
+    public void keyTyped(KeyEvent e){}
 
-    private class trataEventos implements KeyListener 
-    {
-        @Override
-        public void keyTyped(KeyEvent e){}
+    @Override
+    public void keyPressed(KeyEvent e){}
 
-        @Override
-        public void keyPressed(KeyEvent e){}
-
-        @Override
-        public void keyReleased(KeyEvent e){
+    @Override
+    public void keyReleased(KeyEvent e){
         AutoCompleteBean bean = (AutoCompleteBean) campo.getParent();
             
              // ESC = volta pro comeco
-            if(e.getKeyCode()==KeyEvent.VK_ESCAPE){
+       if(e.getKeyCode()==KeyEvent.VK_ESCAPE){
                 bean.atualiza(valores);
                 campo.setText("");
             } 
                         
             if(Character.isLetter(e.getKeyChar()) || e.getKeyCode()==KeyEvent.VK_BACK_SPACE){
-                bean.atualiza(bean.busca(campo.getText()));
-            }
-        }
+               bean.atualiza(bean.busca(campo.getText()));
+       }
     }
 
     public JTextField getCampo() {
@@ -115,6 +111,40 @@ public class AutoCompleteBean extends JComboBox implements Serializable {
         for( Object valor : var )
             this.valores.add(valor.toString());       
     }
-    
+
+    public boolean isCaseSensitive() {
+        return caseSensitive;
+    }
+
+    public void setCaseSensitive(boolean caseSensitive) {
+        this.caseSensitive = caseSensitive;
+    }
+
+    public Color getCorDeFundo() {
+        return corDeFundo;
+    }
+
+    public void setCorDeFundo(Color corDeFundo) {
+        this.corDeFundo = corDeFundo;
+        this.getCampo().setBackground(corDeFundo);
+    }
+
+    public Color getCorSelecionado() {
+        return corSelecionado;
+    }
+
+    public void setCorSelecionado(Color corSelecionado) {
+        this.corSelecionado = corSelecionado;
+        this.getCampo().setSelectionColor(corSelecionado);
+    }
+
+    public Font getFonte() {
+        return fonte;
+    }
+
+    public void setFonte(Font fonte) {
+        this.fonte = fonte;
+        getCampo().setFont(fonte);
+    }   
 
 }
